@@ -555,6 +555,84 @@ details.subsp p{margin-top:6px;font-size:.88rem;font-style:italic;color:var(--in
 .linkbtn{border:0;background:transparent;padding:0;color:var(--accent);font-weight:650;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:inherit}
 .linkbtn:hover{text-decoration-thickness:2px}
 
+/* MOTION: easing tokens, press feedback, reveals. Every effect is gated by reduced motion. */
+:root{--ease-out:cubic-bezier(0.23,1,0.32,1);--ease-in-out:cubic-bezier(0.77,0,0.175,1)}
+
+/* Press feedback: the interface confirms it heard the tap */
+.chip,.mode-tab,.w-state,.pbar,.copy-apa,.uv-btn,.tree button,.empty button,.linkbtn{transition:transform 160ms var(--ease-out),background-color 200ms ease,color 200ms ease}
+.chip:active,.mode-tab:active,.w-state:active,.pbar:active,.copy-apa:active,.uv-btn:active,.tree button:active,.empty button:active,.icon-btn:active{transform:scale(.97)}
+.linkbtn:active{transform:scale(.96)}
+.card-sp{transition:transform 240ms var(--ease-out),box-shadow 240ms var(--ease-out)}
+.card-sp:active{transform:scale(.98)}
+.card-sp .ph{transition:transform 500ms var(--ease-out)}
+.file:active .file-thumb{transform:scale(.93)}
+.btn .circ svg{transition:transform 220ms var(--ease-out)}
+
+/* Hover only where a real pointer exists */
+@media (hover:hover) and (pointer:fine){
+  .card-sp:hover .ph{transform:scale(1.06)}
+  .btn:hover .circ svg{transform:translate(2px,2px)}
+  .logo:hover svg{animation:hop 520ms var(--ease-out)}
+  .pbar:hover .pf{filter:brightness(1.08)}
+}
+@media (hover:none){
+  .card-sp:hover{transform:none;box-shadow:none}
+  .file:hover .file-thumb{transform:none}
+  .file:hover{background:transparent}
+}
+@keyframes hop{0%{transform:none}35%{transform:translateY(-5px) rotate(-10deg)}65%{transform:translateY(0) rotate(4deg)}100%{transform:none}}
+
+/* Window: enters from slightly below, leaves faster than it came */
+dialog.win[open]{animation:winIn 260ms var(--ease-out)}
+dialog.win[open]::backdrop{animation:bdIn 260ms ease}
+dialog.win.closing{animation:winOut 160ms var(--ease-out) forwards}
+dialog.win.closing::backdrop{animation:bdOut 160ms ease forwards}
+@keyframes winIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes winOut{to{opacity:0;transform:translateY(6px) scale(.98)}}
+@keyframes bdIn{from{opacity:0}}
+@keyframes bdOut{to{opacity:0}}
+
+/* Disclosures open with a short settle */
+details.acc[open]>:not(summary){animation:fadeUp 280ms var(--ease-out)}
+.tree .sub.open .gen{animation:fadeUp 220ms var(--ease-out)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* Data that draws itself when it scrolls into view (JS adds .pre only below the fold) */
+.pbar .pf{transform-origin:left center;transition:transform 760ms var(--ease-out),filter 200ms ease;transition-delay:calc(var(--i,0)*40ms)}
+.pbar .pv{transition:opacity 400ms ease;transition-delay:calc(var(--i,0)*40ms + 300ms)}
+.pbars.pre .pf{transform:scaleX(0.001)}
+.pbars.pre .pv{opacity:0}
+.iucn-bar,.subfam .bar{transition:clip-path 1100ms var(--ease-in-out)}
+.iucn-bar.pre,.subfam .bar.pre{clip-path:inset(0 100% 0 0 round 14px)}
+.gest .g-bar{transition:clip-path 700ms var(--ease-out);transition-delay:calc(var(--i,0)*50ms)}
+.gest .g-val{transition:opacity 400ms ease;transition-delay:calc(var(--i,0)*50ms + 350ms)}
+.gest.pre .g-bar{clip-path:inset(0 100% 0 0)}
+.gest.pre .g-val{opacity:0}
+.cal .m{transition:opacity 420ms ease,transform 420ms var(--ease-out);transition-delay:calc(var(--c,0)*28ms)}
+.cal.pre .m{opacity:0;transform:scale(.8)}
+.desk-grid .file{transition:opacity 380ms var(--ease-out),transform 460ms var(--ease-out),filter 350ms,background .2s;transition-delay:calc(var(--k,0)*30ms)}
+.desk-grid.pre .file{opacity:0;transform:translateY(10px) scale(.9)}
+.dots i{transition:transform 360ms var(--ease-out),opacity 360ms ease;transition-delay:calc(var(--d,0)*9ms)}
+.dots.pre i{transform:scale(.3);opacity:0}
+
+/* Scroll-driven reveals (only where the browser supports view timelines; otherwise content is simply visible) */
+@supports (animation-timeline: view()){
+  @media (prefers-reduced-motion:no-preference){
+    main .h2,main .lede,.fact,.legend .it,.vs-card,.cell,.tier,.vrow,.recs li,.pcats>div,.big-pair>div,.crias-list p,.pnotes p,.cons,.menu,.news,.caveats,.explorer,.desk,.cal,.w-grid,.stories-head{animation:rise-in linear both;animation-timeline:view();animation-range:entry 0% entry 45%}
+    .vs-card img,.w-bottom img,.news img,.c-planeo img,.c-tobillo img{animation:clip-in linear both;animation-timeline:view();animation-range:entry 0% cover 40%}
+    .hero-inner{animation:hero-out linear both;animation-timeline:view();animation-range:exit 0% exit 80%}
+  }
+}
+@keyframes rise-in{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes clip-in{from{clip-path:inset(10% 6% 10% 6%);transform:scale(1.08)}to{clip-path:inset(0 0 0 0);transform:none}}
+@keyframes hero-out{to{opacity:.15;transform:translateY(-48px)}}
+
+@media (prefers-reduced-motion:reduce){
+  .pre .pf,.pre .g-bar,.pre .m,.pre .file,.pre i{transform:none!important;clip-path:none!important;opacity:1!important}
+  .iucn-bar.pre,.subfam .bar.pre{clip-path:none!important}
+  .logo:hover svg{animation:none}
+}
+
 /* RESPONSIVE */
 @media (max-width:1100px){
   .desk-grid{grid-template-columns:repeat(8,minmax(0,1fr))}
@@ -1344,6 +1422,19 @@ const CREDIT_LABEL={"gris":"Ardilla gris (fondo del escritorio)","roja-pinceles"
 
 function icons(){ if(window.lucide){ lucide.createIcons({attrs:{"stroke-width":1.75}}); } }
 
+/* Motion helpers */
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EASE="cubic-bezier(0.23, 1, 0.32, 1)";
+function fx(el,frames,opts){ if(RM||!el||!el.animate) return; el.animate(frames,Object.assign({duration:220,easing:EASE},opts||{})); }
+function revealOnce(el,onGo){
+  if(RM||!el||!("IntersectionObserver" in window)) return;
+  if(el.getBoundingClientRect().top<innerHeight*0.85) return; // already visible at load: stay at rest
+  el.classList.add("pre");
+  const io=new IntersectionObserver(es=>{ if(es.some(x=>x.isIntersecting)){ io.disconnect(); requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.classList.remove("pre"); if(onGo) onGo(); })); } },{rootMargin:"0px 0px -12% 0px"});
+  io.observe(el);
+}
+
+
 /* Desktop */
 const ORDER=["leeme","gris","zorro","roja","roja-americana","listada","artica","marmota-monax","marmota-alpina","perrito","voladora-sur","gigante-india","gigante-voladora","pigmea-africana","pigmea-minima","vientre-rojo","california","vancouver"];
 const SLOTS=[[1,1],[1,2],[2,1],[1,3],[2,2],[1,4],[2,4],[1,5],[3,5],[10,1],[9,1],[10,2],[9,2],[10,3],[9,3],[10,4],[10,5],[9,5]];
@@ -1496,13 +1587,15 @@ Las fotos son de Wikimedia Commons. Los créditos están en cada ficha y al fina
   const b=wc.querySelector(".win-body,.leeme"); if(b) b.scrollTop=0;
 }
 function open(key,list){ curList=list||curList; render(key); if(!win.open) win.showModal(); }
-function step(d){ const base=curList.indexOf(cur); const i=(base+d+curList.length)%curList.length; render(curList[i<0?0:i]); }
+function step(d,viaKey){ const base=curList.indexOf(cur); const i=(base+d+curList.length)%curList.length; render(curList[i<0?0:i]); if(!viaKey) fx(wc.querySelector(".win-body,.leeme"),[{opacity:0,transform:`translateX(${d*16}px)`,filter:"blur(3px)"},{opacity:1,transform:"none",filter:"blur(0)"}],{duration:240}); }
+function closeWin(){ if(!win.open||win.classList.contains("closing")) return; if(RM){ win.close(); return; } win.classList.add("closing"); setTimeout(()=>{ win.classList.remove("closing"); win.close(); },160); }
+win.addEventListener("cancel",e=>{ e.preventDefault(); closeWin(); });
 grid.addEventListener("click",e=>{const f=e.target.closest(".file"); if(f) open(f.dataset.id==="leeme"?"leeme":"f:"+f.dataset.id,LIST);});
-document.getElementById("win-close").addEventListener("click",()=>win.close());
+document.getElementById("win-close").addEventListener("click",closeWin);
 document.getElementById("win-prev").addEventListener("click",()=>step(-1));
 document.getElementById("win-next").addEventListener("click",()=>step(1));
-win.addEventListener("click",e=>{ if(e.target===win) win.close(); });
-win.addEventListener("keydown",e=>{ if(e.target.tagName==="SUMMARY") return; if(e.key==="ArrowRight"){e.preventDefault();step(1);} if(e.key==="ArrowLeft"){e.preventDefault();step(-1);} });
+win.addEventListener("click",e=>{ if(e.target===win) closeWin(); });
+win.addEventListener("keydown",e=>{ if(e.target.tagName==="SUMMARY") return; if(e.key==="ArrowRight"){e.preventDefault();step(1,true);} if(e.key==="ArrowLeft"){e.preventDefault();step(-1,true);} });
 
 /* Catalog explorer */
 const SUBS=["Callosciurinae","Ratufinae","Sciurillinae","Sciurinae","Xerinae"];
@@ -1521,7 +1614,7 @@ function card(e){
   return `<button class="card-sp" data-id="${e.id}" aria-label="Abrir ficha: ${esc(e.es)}, ${esc(e.sci)}">${mainPh(e,true)}<span class="tx"><span class="nm">${esc(cap(e.es))}${e.esOk?"":" *"}</span><span class="sc">${esc(e.sci)}</span><span class="row"><span class="st st-${e.iucn}" title="${IUCN[e.iucn]}">${e.iucn}</span>${e.pred&&e.pred.length?`<span class="mini" title="Depredadores documentados"><i data-lucide="shield-alert"></i>${e.pred.length}</span>`:""}${e.hib?`<span class="mini" title="Hiberna"><i data-lucide="snowflake"></i></span>`:""}</span></span></button>`;
 }
 let lastList=[];
-function renderGrid(){
+function renderGrid(anim){
   const L=filtered();
   if(ST.sort==="az") L.sort((a,b)=>a.es.localeCompare(b.es,"es"));
   if(ST.sort==="risk") L.sort((a,b)=>RISK[a.iucn]-RISK[b.iucn]||a.es.localeCompare(b.es,"es"));
@@ -1539,6 +1632,7 @@ function renderGrid(){
   const pc=$("pred-chip"); if(ST.pred){pc.hidden=false; pc.innerHTML=`<span class="pred-filter">Presas de: ${esc(ST.pred)}<button aria-label="Quitar filtro de depredador" id="pred-x"><i data-lucide="x"></i></button></span>`; $("pred-x").onclick=()=>{ST.pred="";renderGrid();};} else pc.hidden=true;
   tree.querySelectorAll("button").forEach(b=>{ const on=(b.dataset.all!==undefined&&!ST.sub&&!ST.g)||(b.dataset.g&&b.dataset.g===ST.g)||(b.dataset.sub&&b.dataset.sub===ST.sub&&!ST.g); b.setAttribute("aria-current",on?"true":"false"); });
   icons();
+  if(anim!==false) [...exGrid.querySelectorAll(".card-sp,.genus-h")].slice(0,28).forEach((c,i)=>fx(c,[{opacity:0,transform:"translateY(10px) scale(.98)"},{opacity:1,transform:"none"}],{duration:300,delay:i*22,fill:"backwards"}));
 }
 function renderTree(){
   tree.innerHTML=`<li><button data-all="">Todas las especies <span class="n">284</span></button></li>`+SUBS.map(s=>{
@@ -1555,7 +1649,7 @@ tree.addEventListener("click",ev=>{
   else if(b.dataset.sub){ const li=b.parentElement; const wasOpen=li.classList.contains("open"); const same=ST.sub===b.dataset.sub&&!ST.g; li.classList.toggle("open",same?!wasOpen:true); b.setAttribute("aria-expanded",li.classList.contains("open")); ST.sub=b.dataset.sub; ST.g=""; }
   $("f-genus").value=ST.g; renderGrid();
 });
-$("f-q").addEventListener("input",e=>{ST.q=e.target.value;renderGrid();});
+$("f-q").addEventListener("input",e=>{ST.q=e.target.value;renderGrid(false);});
 $("f-life").addEventListener("change",e=>{ST.life=e.target.value;renderGrid();});
 $("f-reg").addEventListener("change",e=>{ST.reg=e.target.value;renderGrid();});
 $("f-iucn").addEventListener("change",e=>{ST.iucn=e.target.value;renderGrid();});
@@ -1570,7 +1664,7 @@ document.addEventListener("click",ev=>{
   if(b.dataset.life){ resetFilters(); ST.life=b.dataset.life; $("f-life").value=ST.life; renderGrid(); $("catalogo").scrollIntoView({behavior:"smooth"}); }
   if(b.dataset.open){ open("c:"+b.dataset.open,["c:"+b.dataset.open]); }
 });
-renderTree(); renderGrid();
+renderTree(); renderGrid(false);
 
 /* Conservation bar */
 (function(){
@@ -1585,7 +1679,7 @@ renderTree(); renderGrid();
   withPred.forEach(e=>e.pred.forEach(p=>{cnt[p.es]=(cnt[p.es]||0)+1;cat[p.es]=p.cat;}));
   const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"es")).slice(0,16), max=top[0][1];
   $("pred-n").textContent=withPred.length;
-  $("pbars").innerHTML=top.map(([n,v])=>`<button class="pbar" role="listitem" data-pred="${esc(n)}" aria-label="${esc(n)}: caza ${v} especies. Ver sus presas en el catálogo"><span class="pn">${esc(cap(n))}</span><span class="pt"><span class="pf ${cat[n]}" style="width:${(v/max*80).toFixed(1)}%"></span><span class="pv" style="left:calc(${(v/max*80).toFixed(1)}% + 8px)">${v} especies</span></span></button>`).join("");
+  $("pbars").innerHTML=top.map(([n,v],i)=>`<button class="pbar" style="--i:${i}" role="listitem" data-pred="${esc(n)}" aria-label="${esc(n)}: caza ${v} especies. Ver sus presas en el catálogo"><span class="pn">${esc(cap(n))}</span><span class="pt"><span class="pf ${cat[n]}" style="width:${(v/max*80).toFixed(1)}%"></span><span class="pv" style="left:calc(${(v/max*80).toFixed(1)}% + 8px)">${v} especies</span></span></button>`).join("");
   const byCat=k=>withPred.filter(e=>e.pred.some(p=>p.cat===k)).length, distinct=k=>new Set(withPred.flatMap(e=>e.pred.filter(p=>p.cat===k).map(p=>p.es))).size;
   $("pcats").innerHTML=[["ave","aves"],["mam","mamíferos"],["rep","reptiles"]].map(([k,l])=>`<div><strong>${byCat(k)}</strong><span>especies cazadas por ${l} (${distinct(k)} depredadores distintos)</span></div>`).join("");
   $("pbars").addEventListener("click",ev=>{const b=ev.target.closest(".pbar"); if(!b) return; resetFilters(); ST.pred=b.dataset.pred; renderGrid(); $("catalogo").scrollIntoView({behavior:"smooth"});});
@@ -1593,8 +1687,8 @@ renderTree(); renderGrid();
 
 /* Tabs */
 const tabs=[...document.querySelectorAll(".mode-tab")];
-function selectTab(t){ tabs.forEach(x=>{const on=x===t; x.setAttribute("aria-selected",on); x.tabIndex=on?0:-1; document.getElementById(x.getAttribute("aria-controls")).hidden=!on;}); }
-tabs.forEach((t,i)=>{ t.addEventListener("click",()=>selectTab(t)); t.addEventListener("keydown",e=>{ let j=null; if(e.key==="ArrowRight"||e.key==="ArrowDown") j=(i+1)%tabs.length; if(e.key==="ArrowLeft"||e.key==="ArrowUp") j=(i-1+tabs.length)%tabs.length; if(j!==null){e.preventDefault(); selectTab(tabs[j]); tabs[j].focus();} }); });
+function selectTab(t,anim){ tabs.forEach(x=>{const on=x===t; x.setAttribute("aria-selected",on); x.tabIndex=on?0:-1; document.getElementById(x.getAttribute("aria-controls")).hidden=!on;}); if(anim) fx(document.getElementById(t.getAttribute("aria-controls")),[{opacity:0,filter:"blur(4px)",transform:"translateY(8px)"},{opacity:1,filter:"blur(0)",transform:"none"}],{duration:280}); }
+tabs.forEach((t,i)=>{ t.addEventListener("click",()=>selectTab(t,true)); t.addEventListener("keydown",e=>{ let j=null; if(e.key==="ArrowRight"||e.key==="ArrowDown") j=(i+1)%tabs.length; if(e.key==="ArrowLeft"||e.key==="ArrowUp") j=(i-1+tabs.length)%tabs.length; if(j!==null){e.preventDefault(); selectTab(tabs[j]); tabs[j].focus();} }); });
 
 /* Calendar */
 const MES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
@@ -1618,9 +1712,9 @@ CAL.map(r=>`<div class="cal-row"><span class="cal-name">${r.n}<small>${r.s}</sma
 /* Gestation chart, scale 20-50 days */
 const GEST=[["Ardilla zorro",44,45],["Ardilla gris",44,44],["Ardilla roja euroasiática",38,39],["Ardilla roja americana",35,35],["Marmota alpina",33,34],["Ardilla listada",31,32],["Marmota norteamericana",31,32],["Marmota de Vancouver",30,35],["Ardilla gigante (R. bicolor)",28,35],["Ardilla ártica",25,30]];
 const pct=v=>(v-20)/30*100;
-document.getElementById("gest").innerHTML=GEST.map(([n,a,b,u])=>{
+document.getElementById("gest").innerHTML=GEST.map(([n,a,b,u],gi)=>{
   const L=pct(a), W=pct(b)-pct(a);
-  return `<div class="g-row"><span class="g-name">${n}${u?" *":""}</span><div class="g-plot"><span class="g-bar${u?" unv":""}" style="left:calc(${L}% - 6px);width:calc(${W}% + 12px)"></span><span class="g-val" style="left:calc(${pct(b)}% + 12px)">${a===b?"~"+a:a+"-"+b} d</span></div></div>`;
+  return `<div class="g-row" style="--i:${gi}"><span class="g-name">${n}${u?" *":""}</span><div class="g-plot"><span class="g-bar${u?" unv":""}" style="left:calc(${L}% - 6px);width:calc(${W}% + 12px)"></span><span class="g-val" style="left:calc(${pct(b)}% + 12px)">${a===b?"~"+a:a+"-"+b} d</span></div></div>`;
 }).join("")+`<div class="g-axis">${[20,25,30,35,40,45,50].map(v=>`<span style="left:${pct(v)}%">${v}</span>`).join("")}</div>`;
 
 /* Thermometer, scale -5 to 40 C */
@@ -1641,6 +1735,7 @@ function setState(k){ const s=STATES.find(x=>x.k===k);
   wd.innerHTML=`<strong>${s.big}</strong><h3>${s.h}</h3><p>${s.p}</p>`; }
 ws.addEventListener("click",e=>{const b=e.target.closest(".w-state"); if(b) setState(b.dataset.k);});
 setState("art");
+ws.addEventListener("click",()=>fx(wd,[{opacity:0,filter:"blur(4px)",transform:"translateY(6px)"},{opacity:1,filter:"blur(0)",transform:"none"}],{duration:280}));
 
 /* UV */
 const uvb=document.getElementById("uv-btn"), uvc=document.getElementById("uv-cell");
@@ -1668,7 +1763,7 @@ document.getElementById("apa-extra").innerHTML=APA.extra.map(apaItem).join("");
 const copyBtn=document.getElementById("copy-apa");
 copyBtn.addEventListener("click",()=>{
   const txt=[...APA.main,...APA.extra].map(([t,u])=>(t.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&")+" "+u)).sort((a,b)=>a.localeCompare(b,"es")).join("\n");
-  const done=ok=>{copyBtn.querySelector("span").textContent=ok?"Copiada":"Selecciona y copia la lista"; setTimeout(()=>copyBtn.querySelector("span").textContent="Copiar bibliografía",2500);};
+  const done=ok=>{fx(copyBtn.querySelector("span"),[{opacity:0,filter:"blur(3px)"},{opacity:1,filter:"blur(0)"}],{duration:200}); copyBtn.querySelector("span").textContent=ok?"Copiada":"Selecciona y copia la lista"; setTimeout(()=>copyBtn.querySelector("span").textContent="Copiar bibliografía",2500);};
   try{ navigator.clipboard.writeText(txt).then(()=>done(true),()=>{selectList();done(false);}); }catch(e){ selectList(); done(false); }
 });
 function selectList(){ const r=document.createRange(); r.selectNodeContents(document.getElementById("apa-list")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
@@ -1690,6 +1785,16 @@ if("IntersectionObserver" in window){
   ["inicio","familia"].forEach(id=>io.observe(document.getElementById(id)));
 }
 
+
+/* Scroll reveals for data graphics and the desktop */
+files.forEach((el,i)=>el.style.setProperty("--k",i));
+document.querySelectorAll("#cal .cal-row").forEach((row,r)=>row.querySelectorAll(".m").forEach((m,c)=>m.style.setProperty("--c",r*2+c)));
+document.querySelectorAll("#uk-dots i").forEach((d,i)=>d.style.setProperty("--d",i));
+["pbars","iucn-bar","gest","cal","uk-dots"].forEach(id=>revealOnce(document.getElementById(id)));
+revealOnce(document.querySelector(".subfam .bar"));
+const clearK=()=>files.forEach(el=>el.style.removeProperty("--k")); // later filtering must not inherit the entrance delay
+revealOnce(grid,()=>setTimeout(clearK,1400));
+if(!grid.classList.contains("pre")) clearK();
 icons();
 })();
 </script>
